@@ -1,0 +1,246 @@
+def replace_char_by_list(text, tuplesForSubstituitions):
+    array_of_switched_chars = []
+    for idx, tupl in enumerate(tuplesForSubstituitions):
+        # Here it makes sure that we are replacing different chars with the same solution
+        if (tupl[1] not in array_of_switched_chars):
+            # for each tuple of substitution it replaces the first element with the second
+            # inside of text
+            text = text.replace(tupl[0], tupl[1])
+            array_of_switched_chars.append(tupl[1])
+        else:
+            print(
+                'WARNING: you are trying to replace more than one char with: ', tupl[1])
+
+    return text
+
+
+# USAGE
+print(replace_char_by_list("A'I MFFG", [
+      ('A', 'i'),
+      ('I', 'm'),
+      ('M', 'g'),
+      ('F', 'o'),
+      ('G', 'd')
+      ]))
+
+
+////////
+
+
+# Look at the shifting_by_key.py file
+from shifting_by_key import shift_char_by_key, deshift_char_by_key
+
+
+def vigenere_enc(data, key):
+    # PRE: data is a string with only alphabetic chars; data is a string with only alphabetic chars
+    # POST: encryption with vigenere algorithm
+    cif_string = ""
+    for i in range(len(data)):
+        cif_string += shift_char_by_key(data[i], key[i % len(key)], 'a' if (
+            ord(data[i]) >= ord('a') and ord(data[i]) <= ord('z')) else 'A')
+    return cif_string
+
+
+def vigenere_dec(data, key):
+    # PRE: data is a string with only alphabetic chars; data is a string with only alphabetic chars
+    # POST: decryption with vigenere algorithm
+    cif_string = ""
+    for i in range(len(data)):
+        cif_string += deshift_char_by_key(data[i], key[i % len(key)], 'a' if (
+            ord(data[i]) >= ord('a') and ord(data[i]) <= ord('z')) else 'A')
+    return cif_string
+
+
+# USAGE
+print(vigenere_dec(vigenere_enc('provaprova', 'cesare'), 'cesare'))
+
+
+///////////
+
+
+import string
+
+
+def count_words(text, letters):
+    Words = {}
+
+    for letter in text:
+        if letter not in string.ascii_letters:
+            text = text.replace(letter, " ")
+
+    for word in text.split():
+        if word in Words:
+            Words[word] += 1
+        elif len(word) == letters:
+            Words[word] = 1
+
+    Words = dict(sorted(Words.items(), key=lambda item: item[1], reverse=True))
+    return Words
+
+
+# USAGE
+print(count_words("pronto prova, sa sa, prova microfono, uno due 3", 3))
+
+
+//////////
+
+
+import base64
+
+
+def base64_to_text(b64txt):
+    return base64.b64decode(b64txt).decode('UTF-8', errors="ingore")
+
+
+def text_to_base64(text):
+    return base64.b64encode(bytes(text, 'utf-8'))
+
+
+def text_to_hex(text):
+    return text.encode("utf-8").hex()
+
+
+def hex_to_text(hextxt):
+    return bytearray.fromhex(hextxt).decode()
+
+
+# USAGE
+b64txt = text_to_base64("prova 123")
+print(b64txt)
+print(base64_to_text(b64txt))
+hextxt = text_to_hex("ciao a tutti")
+print(hextxt)
+print(hex_to_text(hextxt))
+
+
+//////////
+
+
+def char_frequency(strToAnalyze):
+    dict = {}
+    countedChars = 0
+    for n in strToAnalyze:
+        keys = dict.keys()
+        # if a char it's between the range a - Z, or A - Z, then it's counted
+        if (ord(n) <= ord('z') and ord(n) >= ord('a')) or (ord(n) <= ord('Z') and ord(n) >= ord('A')):
+            if n in keys:
+                dict[n] += 1
+            else:
+                dict[n] = 1
+            # here we are keeping a counter, to obtain percentages, for every char counted
+            countedChars += 1
+    for n in dict:
+        # calculating the percentage of relative frequency, for each char counted
+        dict[n] = round(dict[n] / countedChars, 2)
+    # returning in descending order, to allow a better understanding/readability of the data
+    return sorted(dict.items(), key=lambda kv: kv[1], reverse=True)
+
+
+# USAGE
+print(char_frequency("provaprova ciao"))
+
+
+////////
+
+
+def find_in(to_search, space):
+    # PRE: to_search and space are both strings
+
+    # Lowering the case to improve search without seeing at the case
+    to_searchLW = to_search.lower()
+    spaceLW = space.lower()
+    # Seeing if we found to_searchLW in spaceLW
+    found = to_searchLW in spaceLW
+    # Returning a tuple that shows if it's found, and if found, at what index it is
+    return (found, spaceLW.index(to_searchLW) if found else 0)
+
+
+# USAGE
+print(find_in("prova", "adsfjalsdfjaofjalkfjajfPrOvAdslfkjaflkjasfòjal"))
+
+
+
+/////////
+
+
+def shift_char_by_key(char1, key, startingLetter):
+    # PRE: char1 is a char, key is a char, startingLetter is 'a' or 'A'
+    return chr(((ord(char1)-ord(startingLetter))+(ord(key)-ord(startingLetter))) % 26+ord(startingLetter))
+
+
+def deshift_char_by_key(char1, key, startingLetter):
+    # PRE: char1 is a char, key is a char, startingLetter is 'a' or 'A'
+    return chr(((ord(char1)-ord(startingLetter))-(ord(key)-ord(startingLetter))) % 26+ord(startingLetter))
+
+
+# USAGE
+print(deshift_char_by_key(shift_char_by_key('c', 'a', 'a'), 'a', 'a'))
+print(deshift_char_by_key('c', 'a', 'a'))
+
+
+///////
+
+
+# THE KEY IS A STRING
+def xor_enc_strk(data, key):
+    # PRE: data is a string; key is a string
+    # POST: it's returned an array of binaries in hex form
+    newKey = []
+    for idx in range(len(data)):
+        newKey.insert(0, key[idx % len(key)])
+    print(newKey)
+    return [chr(ord(x) ^ ord(y)) for x, y in zip(data, newKey)]
+
+
+def xor_dec_strk(data, key):
+    # PRE: data it's an array of binaries in hex form; key is a string
+    # POST: it's returned a decrypted string (it's the right string, only if the right
+    # key is used)
+    newKey = []
+    for idx in range(len(data)):
+        newKey.insert(0, key[idx % len(key)])
+    return ''.join([chr(ord(x) ^ ord(y)) for x, y in zip(data, newKey)])
+
+
+# THE KEY IS AN INTEGER/CHAR
+
+
+def xor_enc_intk(data, key):
+    # PRE: data is a string; key is an integer
+    # POST: it's returned an array of binaries in hex form
+    newKey = []
+    for idx in range(len(data)):
+        newKey.insert(0, key)
+    return [chr(ord(x) ^ y) for x, y in zip(data, newKey)]
+
+
+def xor_dec_intk(data, key):
+    # PRE: data it's an array of binaries in hex form; key is an integer
+    # POST: it's returned a decrypted string (it's the right string, only if the right
+    # key is used)
+    newKey = []
+    for idx in range(len(data)):
+        newKey.insert(0, key)
+    return ''.join([chr(ord(x) ^ y) for x, y in zip(data, newKey)])
+
+
+# USAGE
+x = xor_enc_strk('c', "un carattere")
+print(x)
+print(xor_dec_strk(x, "un carattere"))
+x = xor_enc_strk("ciao menny", "hello")
+print(x)
+print(xor_dec_strk(x, "hello"))
+x = xor_enc_intk("ciao carra", 150)
+print(x)
+print(xor_dec_intk(x, 150))
+
+
+//////////////
+import base64
+def stringToBase64(s):
+    return base64.b64encode(s.encode('utf-8'))
+
+def base64ToString(b):
+    return base64.b64decode(b).decode('utf-8')
+
