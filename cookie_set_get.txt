@@ -1,0 +1,8 @@
+#settare i cookie di una pagina
+cookies_dict = {"nome_cookie":valore_cookie}
+response = requests.get("http://127.0.0.1:8080", cookies = cookies_dict)
+print(response.cookies.get_dict())
+
+#get dei cookie della pagina
+response = requests.get("http://127.0.0.1:8080")
+print(response.cookies.get_dict())
